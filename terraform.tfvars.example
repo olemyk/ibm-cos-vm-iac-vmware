@@ -1,0 +1,116 @@
+#
+# Copyright 2024- IBM Inc. All rights reserved
+# SPDX-License-Identifier: Apache2.0
+#
+# Example Terraform variables file for IBM COS on VMware vCenter
+# Copy this file to terraform.tfvars and customize for your environment
+#
+# IMPORTANT: This configuration uses Packer templates instead of OVA files
+# You must build the Packer templates first (see packer/README.md)
+
+# =============================================================================
+# vCenter Connection Settings
+# =============================================================================
+vsphere_server   = "vcenter.example.com"
+vsphere_user     = "administrator@vsphere.local"
+vsphere_password = "your-password-here"
+
+# Set to true if using self-signed certificates
+vsphere_allow_unverified_ssl = true
+
+# =============================================================================
+# vCenter Infrastructure Settings
+# =============================================================================
+vsphere_datacenter   = "Datacenter"
+vsphere_cluster      = "Cluster"
+vsphere_datastore    = "datastore1"
+vsphere_network      = "VM Network"
+vsphere_resource_pool = ""  # Leave empty to use cluster root resource pool
+vsphere_host         = ""  # Optional: specific ESXi host for deployment
+
+# =============================================================================
+# VM Organization
+# =============================================================================
+# VMs will be placed in this folder in vCenter (will be created if it doesn't exist)
+vm_folder = "COS-System-1"
+
+# =============================================================================
+# Packer Template Configuration
+# =============================================================================
+# Template names must match those created by Packer
+cos_manager_template   = "cos-manager-template"
+cos_accesser_template  = "cos-accesser-template"
+cos_slicestor_template = "cos-slicestor-template"
+
+# SSH key for VM configuration (same key used by Packer)
+ssh_private_key_path = "./packer/packer_rsa"
+
+# =============================================================================
+# IBM COS Configuration
+# =============================================================================
+cos_version    = "3.20.1.59"  # Must match Packer template version
+system_index   = 1
+num_slicestors = 3  # Must be 3 or 6
+
+# =============================================================================
+# Network Configuration
+# =============================================================================
+# IMPORTANT: base_ip is for production deployment (10.33.3.203+)
+# Templates use 10.33.3.200-202 and will be reconfigured automatically
+base_ip     = "10.33.3.203"  # Manager IP (Accesser: .204, Slicestors: .205+)
+netmask     = "255.255.255.0"
+gateway     = "10.33.3.1"
+dns_servers = "8.8.8.8,8.8.4.4"
+ntp_servers = "pool.ntp.org,time.google.com"
+
+# =============================================================================
+# VM Resource Configuration (Per IBM Documentation)
+# =============================================================================
+# Manager VM - Updated per IBM docs
+manager_cpu        = 4      # vCPUs
+manager_memory     = 16384  # 16 GB RAM
+manager_disk_size  = 256    # GB boot disk
+
+# Accesser VM - Updated per IBM docs
+accesser_cpu       = 4      # vCPUs
+accesser_memory    = 16384  # 16 GB RAM
+accesser_disk_size = 128    # GB boot disk
+
+# Slicestor VMs - Per IBM docs
+slicestor_cpu              = 2      # vCPUs
+slicestor_memory           = 8192   # 8 GB RAM
+slicestor_disk_size        = 128    # GB boot disk
+slicestor_data_disk_size   = 128    # GB per data disk (12 disks = 1.5 TB per Slicestor)
+slicestor_data_disk_count  = 12     # Number of data disks per Slicestor
+
+# =============================================================================
+# Organization Settings
+# =============================================================================
+organization_name = "IBM"
+country_code      = "US"  # 2-letter ISO country code
+
+# =============================================================================
+# Deployment Options
+# =============================================================================
+# Set to 0 for template-based deployment (VMs configured via SSH)
+wait_for_guest_net_timeout = 0
+
+# =============================================================================
+# Notes
+# =============================================================================
+# 1. Build Packer templates first:
+#    cd packer && ./build-all-templates.sh
+#
+# 2. Verify templates exist in vCenter:
+#    govc ls /Datacenter/vm/Templates
+#
+# 3. Deployment is sequential to avoid IP conflicts:
+#    Manager → Accesser → Slicestor1 → Slicestor2 → Slicestor3
+#
+# 4. Total deployment time: ~25 minutes for 1+1+3 configuration
+#
+# 5. Total storage required:
+#    - Manager: 256 GB
+#    - Accesser: 128 GB
+#    - 3 Slicestors: 3 x 1.628 TB = 4.884 TB
+#    - Total: ~5.3 TB

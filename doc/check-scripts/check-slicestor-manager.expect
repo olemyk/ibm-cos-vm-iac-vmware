@@ -1,0 +1,24 @@
+#!/usr/bin/expect -f
+set timeout 10
+
+foreach {num ip} {1 10.33.3.112 2 10.33.3.113 3 10.33.3.114} {
+    puts "\n=== Checking Slicestor $num at $ip ==="
+    
+    spawn ssh -i ./packer/packer_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null localadmin@$ip
+    
+    expect {
+        -re "#|>" {
+            send "show system\r"
+            expect -re "#|>"
+            puts $expect_out(buffer)
+            send "exit\r"
+            expect eof
+        }
+        timeout {
+            puts "Connection timeout"
+        }
+        eof {
+            puts "Connection failed"
+        }
+    }
+}

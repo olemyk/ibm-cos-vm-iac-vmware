@@ -1,0 +1,39 @@
+# Packer Variables for IBM COS Manager Template Creation
+# Copy this file to variables.pkrvars.hcl and customize for your environment
+#
+# Based on real installation analysis from doc/ISO-INSTALLATION-ANALYSIS.md
+# Installation time: ~9 minutes from boot to operational
+
+# vCenter Connection
+vcenter_server     = "vcenter.oslo.forum.ibm.com"
+vcenter_username   = "administrator@vsphere.local"
+vcenter_password   = "your-password-here"
+
+# vCenter Infrastructure
+vcenter_datacenter = "TEC"
+vcenter_cluster    = "ProdGen8"
+vcenter_host       = ""  # Optional: Pin to specific ESXi host (e.g., "vmware03.oslo.forum.ibm.com")
+vcenter_datastore  = "vmware_svc_cluster_fs900_3_1"
+vcenter_network    = "VM Network"
+vcenter_folder     = "Templates"
+
+# Network Configuration for Manager Template
+manager_ip = "10.33.3.200"
+netmask    = "255.255.255.0"
+gateway    = "10.33.3.1"
+dns        = "10.33.3.1"
+ntp        = "10.33.3.1"
+
+# System Configuration
+organization = "IBM"
+country      = "US"
+
+# ISO Path
+# The all-in-one ISO contains Manager, Accesser, and Slicestor installers
+iso_path = "[vmware_svc_cluster_fs900_3_1] iso/clevos-3.20.1.59-allinone-usbiso.iso"
+
+# Notes:
+# - Installation takes approximately 9 minutes
+# - Boot commands are based on real installation screenshots
+# - Template will be created in the specified folder
+# - SSH will be available after network configuration

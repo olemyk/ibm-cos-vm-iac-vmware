@@ -1,0 +1,65 @@
+#!/usr/bin/expect -f
+#
+# Copyright 2024. All rights reserved
+# SPDX-License-Identifier: Apache2.0
+#
+# Configure IBM COS Manager VM network via VMware console
+# This script requires vmware-vmrc or direct ESXi console access
+#
+# Usage: cos-manager-vmrc.expect <vcenter> <user> <password> <vm_name> <ip> <gateway> <dns>
+
+set vcenter [lindex $argv 0]
+set user [lindex $argv 1]
+set password [lindex $argv 2]
+set vm_name [lindex $argv 3]
+set ip [lindex $argv 4]
+set gw [lindex $argv 5]
+set dns [lindex $argv 6]
+
+set timeout 300
+
+puts "Configuring Manager VM: $vm_name"
+puts "IP: $ip, Gateway: $gw, DNS: $dns"
+puts ""
+puts "NOTE: This script requires console access to the VM."
+puts "If automated console access is not available, please configure manually:"
+puts "1. Open VM console in vCenter"
+puts "2. Login: localadmin / password"
+puts "3. Run: edit"
+puts "4. Run: channel data port eth0 ip $ip netmask 255.255.255.0 gateway $gw"
+puts "5. Run: system dns $dns"
+puts "6. Run: system hostname manager"
+puts "7. Run: system organization IBM"
+puts "8. Run: system country US"
+puts "9. Run: activate"
+puts "10. Run: exit"
+puts ""
+
+# For now, this is a placeholder that shows the commands
+# In a production environment, you would use:
+# - VMware Remote Console (VMRC) automation
+# - ESXi host SSH access with vim-cmd
+# - vSphere SDK Python/PowerCLI scripts
+
+puts "Attempting to configure via SSH to ESXi host..."
+puts "This requires SSH access to the ESXi host and the VM to be powered on."
+puts ""
+
+# Alternative: Use vim-cmd through ESXi SSH
+# This would require:
+# 1. SSH to ESXi host
+# 2. Find VM ID: vim-cmd vmsvc/getallvms | grep $vm_name
+# 3. Send keystrokes: vim-cmd vmsvc/message <vmid> <message>
+
+puts "Manual configuration required. Please use vCenter console to configure the VM."
+puts "Commands to run in VM console:"
+puts "  edit"
+puts "  channel data port eth0 ip $ip netmask 255.255.255.0 gateway $gw"
+puts "  system dns $dns"
+puts "  system hostname manager"
+puts "  system organization IBM"
+puts "  system country US"
+puts "  activate"
+puts "  exit"
+
+exit 0

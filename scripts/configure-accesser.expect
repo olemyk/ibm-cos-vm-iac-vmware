@@ -1,0 +1,181 @@
+#!/usr/bin/expect -f
+# Configure IBM COS Accesser via SSH using expect
+# Part 1: Change IP address (connection will be lost after activate)
+
+set timeout 120
+set ssh_key [lindex $argv 0]
+set old_ip [lindex $argv 1]
+set new_ip [lindex $argv 2]
+set netmask [lindex $argv 3]
+set gateway [lindex $argv 4]
+set dns_servers [lindex $argv 5]
+set ntp_servers [lindex $argv 6]
+set hostname [lindex $argv 7]
+set organization [lindex $argv 8]
+set country [lindex $argv 9]
+set manager_ip [lindex $argv 10]
+
+puts "=== Part 1: Generate unique key and change IP address from $old_ip to $new_ip ==="
+spawn ssh -i $ssh_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null localadmin@$old_ip
+
+expect {
+    -re "#|>" {
+        send "edit\r"
+        expect -re "#|>"
+        # Generate unique private key FIRST
+        send "system rekey\r"
+        expect {
+            "Reset private key?" {
+                send "y\r"
+                expect {
+                    "Private key reset" {
+                        puts "Private key regenerated successfully"
+                    }
+                    timeout {
+                        puts "Timeout waiting for rekey confirmation"
+                        exit 1
+                    }
+                }
+                expect -re "#|>"
+            }
+            -re "#|>" {
+                puts "No rekey prompt (unexpected)"
+            }
+            timeout {
+                puts "Timeout waiting for rekey prompt"
+                exit 1
+            }
+        }
+        # Now change IP in same session
+        send "channel data port eth0 ip $new_ip netmask $netmask gateway $gateway\r"
+        expect -re "#|>"
+        send "activate\r"
+        # Wait for "check OK" message
+        expect {
+            "check OK" {
+                puts "Rekey and IP change activated successfully"
+            }
+            timeout {
+                puts "Timeout waiting for activation"
+                exit 1
+            }
+        }
+        # Try to send reboot, but connection may be lost during network reconfiguration
+        expect {
+            -re "#|>" {
+                send "reboot\r"
+                expect {
+                    "Reboot?" {
+                        send "y\r"
+                        puts "System rebooting to apply changes..."
+                    }
+                    eof {
+                        puts "Connection lost during reboot (expected)"
+                    }
+                    timeout {
+                        puts "Connection lost after activation (expected)"
+                    }
+                }
+            }
+            eof {
+                puts "Connection lost after activation (expected)"
+            }
+            timeout {
+                puts "Connection lost after activation (expected)"
+            }
+        }
+    }
+    timeout {
+        puts "Timeout waiting for initial prompt"
+        exit 1
+    }
+}
+
+puts "=== Waiting 90 seconds for system to reboot and network to stabilize ==="
+sleep 90
+
+puts "=== Waiting 90 seconds for network reconfiguration and ARP propagation ==="
+sleep 90
+
+# Part 2: Configure system settings on new IP (with retry)
+puts "=== Part 2: Configuring system settings on new IP $new_ip ==="
+
+# Try to connect with retries
+set max_retries 3
+set retry_count 0
+set connected 0
+
+while {$retry_count < $max_retries && $connected == 0} {
+    puts "Connection attempt [expr $retry_count + 1]/$max_retries..."
+    
+    spawn ssh -i $ssh_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 localadmin@$new_ip
+    
+    expect {
+        -re "#|>" {
+            set connected 1
+            puts "Successfully connected to $new_ip"
+        }
+        timeout {
+            puts "Connection timeout, waiting 30 seconds before retry..."
+            incr retry_count
+            if {$retry_count < $max_retries} {
+                sleep 30
+            }
+        }
+        eof {
+            puts "Connection failed, waiting 30 seconds before retry..."
+            incr retry_count
+            if {$retry_count < $max_retries} {
+                sleep 30
+            }
+        }
+    }
+}
+
+if {$connected == 0} {
+    puts "ERROR: Failed to connect after $max_retries attempts"
+    exit 1
+}
+
+# Now we're connected, continue with configuration
+send "edit\r"
+expect -re "#|>"
+send "system dns $dns_servers\r"
+expect -re "#|>"
+send "system ntpservers $ntp_servers\r"
+expect -re "#|>"
+send "system hostname $hostname\r"
+expect -re "#|>"
+send "system organization $organization\r"
+expect -re "#|>"
+send "system country $country\r"
+expect -re "#|>"
+send "manager ip $manager_ip\r"
+# Handle certificate acceptance prompt
+expect {
+    "Accept this certificate?" {
+        send "y\r"
+        expect -re "#|>"
+    }
+    -re "#|>" {
+        # No certificate prompt, continue
+    }
+    timeout {
+        puts "Timeout waiting for certificate prompt or prompt"
+        exit 1
+    }
+}
+send "activate\r"
+expect {
+    "check OK" {
+        puts "System configuration activated successfully"
+    }
+    timeout {
+        puts "Timeout waiting for activation"
+        exit 1
+    }
+}
+expect -re "#|>"
+send "exit\r"
+puts "Configuration completed successfully"
+expect eof

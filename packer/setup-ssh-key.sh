@@ -1,0 +1,9 @@
+#!/bin/bash
+# Script to add SSH public key to IBM COS Manager
+# This will be uploaded and executed via console commands
+
+SSH_KEY="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDQznxOLrYUkQ+1q5ZMig1YM/DmIv/nR0GgAQcmwMI1Ic6CM6H9xJ9NSLhZmY+Q/BM8jPTbL3kgKCFrHEjYmSZ/eMoyKTsxB42fwkymrpEbGR/41qyrqEMMQGwl7LnOfic6TCQJhYx9dSXSy+BGQFc+MLgNQ/kk94mHssEngC9SeNjjpwP4mUvs//vF3WKlAVLXmlDktVvxP5pK4fIOh3vkI88Q6kclb6vYZEOZQ1TFA5aXswgXCLFJE9S5TPETY8WbFPV2jvL3nWFeHWA8B54mr7sfDi2kioSCFPFifyPzLvN2lB5UR55q+uLY4FyPZUtwqFTBjhuU7g9A16o9GoNRd0JVuLuAdpgnSvPf/EHoAaxJXoLsF2IoYiSU9pZYHdwpMYmHO0hgfJKxgofFX6mwWaV3W3hcFuF1RFwGZ52yUvPiiSrSw9RLCQGesZXNThBPjJLjcia20kSuKZpShp8RJzHq6K60cxGglPXWcilKn5D5TOXJLbRozpOtooJ4Bas= olemyk@Oles-MacBook-Pro.local"
+
+echo "$SSH_KEY" | sshkeys set
+
+# Made with Bob

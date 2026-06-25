@@ -1,0 +1,109 @@
+# =============================================================================
+# Terraform
+# =============================================================================
+
+# Local .terraform directory (providers / modules cache)
+.terraform/
+
+# Terraform lock file — pin provider versions via terraform init -upgrade in CI
+.terraform.lock.hcl
+
+# State files — never commit state; use remote backend (S3, Terraform Cloud, etc.)
+terraform.tfstate
+terraform.tfstate.backup
+*.tfstate
+*.tfstate.*
+*.tfstate.*.backup
+
+# Saved plan file
+tfplan
+*.tfplan
+
+# Backup .tf files
+*.tf.bak
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI configuration files
+.terraformrc
+terraform.rc
+
+# =============================================================================
+# Secrets & Credentials
+# =============================================================================
+
+# Variable files that contain real credentials — keep only the .example template
+terraform.tfvars
+!terraform.tfvars.example
+
+# Packer variable files with real credentials
+packer/variables.pkrvars.hcl
+!packer/variables.pkrvars.hcl.example
+
+# SSH private keys
+*.pem
+*.key
+id_rsa
+id_rsa*
+packer/packer_rsa
+# Public keys are safe to commit — *.pub is NOT ignored
+
+# =============================================================================
+# Large Binary Files — OVA / ISO Images
+# =============================================================================
+
+# OVA virtual machine images (hundreds of MB to several GB each)
+ova/*.ova
+ova/*.vmdk
+ova/*.ovf
+ova/*.mf
+ova/*.md5
+# Keep the README that explains where to obtain these files
+!ova/README.md
+
+# ISO installation images (1-6 GB each)
+iso/*.iso
+iso/*.img
+iso/*.md5
+# Keep the README
+!iso/README.md
+
+# Packer ISO staging directory
+packer/iso/
+
+# =============================================================================
+# Packer Build Artefacts
+# =============================================================================
+packer/manifest.json
+packer/manifest-*.json
+
+# =============================================================================
+# Log Files
+# =============================================================================
+*.log
+terraform-apply*.log
+
+# =============================================================================
+# OS / Editor Artefacts
+# =============================================================================
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+.vscode/
+.idea/
+*.iml
+
+# Generic backup files
+*.bak
+*.backup

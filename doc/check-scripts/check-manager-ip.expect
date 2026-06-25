@@ -1,0 +1,27 @@
+#!/usr/bin/expect -f
+set timeout 10
+
+foreach {num ip hostname} {1 10.33.3.112 slicestor1 2 10.33.3.113 slicestor2 3 10.33.3.114 slicestor3} {
+    puts "\n=== Checking $hostname at $ip ==="
+    
+    spawn ssh -i ./packer/packer_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null localadmin@$ip
+    
+    expect {
+        -re "#|>" {
+            send "manager\r"
+            expect -re "#|>"
+            set output $expect_out(buffer)
+            if {[string match "*manager ip*" $output] || [string match "*Manager IP*" $output]} {
+                puts "Manager IP is configured"
+            } else {
+                puts "Manager IP: NOT SET"
+            }
+            puts $output
+            send "exit\r"
+            expect eof
+        }
+        timeout {
+            puts "Connection timeout"
+        }
+    }
+}
