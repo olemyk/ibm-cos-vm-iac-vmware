@@ -1,9 +1,45 @@
 #!/bin/bash
-# Script to add SSH public key to IBM COS Manager
-# This will be uploaded and executed via console commands
+#
+# Copyright 2024- IBM Inc. All rights reserved
+# SPDX-License-Identifier: Apache2.0
+#
+# setup-ssh-key.sh — Generate the Packer SSH key pair used for VM template automation.
+#
+# Run this once before building Packer templates:
+#   cd packer && ./setup-ssh-key.sh
+#
+# The private key (packer_rsa) is git-ignored.
+# The public key (packer_rsa.pub) is committed and embedded in Packer boot commands.
 
-SSH_KEY="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDQznxOLrYUkQ+1q5ZMig1YM/DmIv/nR0GgAQcmwMI1Ic6CM6H9xJ9NSLhZmY+Q/BM8jPTbL3kgKCFrHEjYmSZ/eMoyKTsxB42fwkymrpEbGR/41qyrqEMMQGwl7LnOfic6TCQJhYx9dSXSy+BGQFc+MLgNQ/kk94mHssEngC9SeNjjpwP4mUvs//vF3WKlAVLXmlDktVvxP5pK4fIOh3vkI88Q6kclb6vYZEOZQ1TFA5aXswgXCLFJE9S5TPETY8WbFPV2jvL3nWFeHWA8B54mr7sfDi2kioSCFPFifyPzLvN2lB5UR55q+uLY4FyPZUtwqFTBjhuU7g9A16o9GoNRd0JVuLuAdpgnSvPf/EHoAaxJXoLsF2IoYiSU9pZYHdwpMYmHO0hgfJKxgofFX6mwWaV3W3hcFuF1RFwGZ52yUvPiiSrSw9RLCQGesZXNThBPjJLjcia20kSuKZpShp8RJzHq6K60cxGglPXWcilKn5D5TOXJLbRozpOtooJ4Bas= olemyk@Oles-MacBook-Pro.local"
+set -euo pipefail
 
-echo "$SSH_KEY" | sshkeys set
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+KEY_FILE="$SCRIPT_DIR/packer_rsa"
 
-# Made with Bob
+echo "=========================================="
+echo "IBM COS Packer — SSH Key Setup"
+echo "=========================================="
+echo ""
+
+if [ -f "$KEY_FILE" ]; then
+    echo "✅ Key pair already exists: $KEY_FILE"
+    echo "   Delete it first if you want to regenerate:"
+    echo "   rm $KEY_FILE $KEY_FILE.pub"
+    echo ""
+else
+    echo "🔑 Generating RSA 4096-bit key pair..."
+    ssh-keygen -t rsa -b 4096 -f "$KEY_FILE" -N '' -C 'packer@ibm-cos-automation'
+    chmod 600 "$KEY_FILE"
+    echo ""
+    echo "✅ Key pair created:"
+    echo "   Private key: $KEY_FILE  (git-ignored — never commit this)"
+    echo "   Public key:  $KEY_FILE.pub"
+    echo ""
+fi
+
+echo "Public key contents (embedded in Packer boot_command):"
+echo "--------------------------------------------------------"
+cat "$KEY_FILE.pub"
+echo ""
+echo "Next step: copy variables.pkrvars.hcl.example → variables.pkrvars.hcl"
+echo "         then run: ./build-all-templates.sh"
