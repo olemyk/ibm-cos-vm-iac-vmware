@@ -69,7 +69,7 @@ Use Terraform directly with ISO files and boot commands (similar to Packer but i
 packer {
   required_plugins {
     vsphere = {
-      version = ">= 1.2.0"
+      version = ">= 2.2.0"
       source  = "github.com/hashicorp/vsphere"
     }
   }

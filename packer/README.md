@@ -17,15 +17,15 @@ Using the All-in-One USB ISO file enables **full automation** of IBM COS deploym
 
 #### 1. Packer (Required)
 
-**Version**: >= 1.8.0 (tested with 1.9.4)
+**Version**: >= 1.15.0 (tested with 1.15.4)
 
 ```bash
 # macOS
 brew install packer
 
 # Linux (RHEL/CentOS/Fedora)
-wget https://releases.hashicorp.com/packer/1.9.4/packer_1.9.4_linux_amd64.zip
-unzip packer_1.9.4_linux_amd64.zip
+wget https://releases.hashicorp.com/packer/1.15.4/packer_1.15.4_linux_amd64.zip
+unzip packer_1.15.4_linux_amd64.zip
 sudo mv packer /usr/local/bin/
 chmod +x /usr/local/bin/packer
 

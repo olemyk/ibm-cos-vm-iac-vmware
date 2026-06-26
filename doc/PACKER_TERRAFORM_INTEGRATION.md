@@ -63,8 +63,8 @@ Based on IBM documentation: https://www.ibm.com/docs/en/coss/3.20.0?topic=enviro
 ## Prerequisites
 
 ### Software Requirements
-- **Packer**: >= 1.8.0
-- **Terraform**: >= 1.0.0
+- **Packer**: >= 1.15.0
+- **Terraform**: >= 1.15
 - **govc**: Latest version (for vCenter CLI operations)
 - **SSH**: OpenSSH client
 
@@ -549,5 +549,5 @@ For issues or questions:
 
 **Last Updated**: 2026-06-20  
 **COS Version**: 3.20.1.59  
-**Packer Version**: >= 1.8.0  
-**Terraform Version**: >= 1.0.0
+**Packer Version**: >= 1.15.0
+**Terraform Version**: >= 1.15

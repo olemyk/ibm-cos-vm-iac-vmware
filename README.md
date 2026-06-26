@@ -35,21 +35,21 @@ All VMs are deployed from Packer templates and automatically configured via SSH 
 
 #### Required Tools
 
-1. **Packer** >= 1.8.0 (for building VM templates)
+1. **Packer** >= 1.15.0 (for building VM templates)
    ```bash
    # macOS
    brew install packer
    
    # Linux
-   wget https://releases.hashicorp.com/packer/1.9.4/packer_1.9.4_linux_amd64.zip
-   unzip packer_1.9.4_linux_amd64.zip
+   wget https://releases.hashicorp.com/packer/1.15.4/packer_1.15.4_linux_amd64.zip
+   unzip packer_1.15.4_linux_amd64.zip
    sudo mv packer /usr/local/bin/
    
    # Verify
    packer version
    ```
 
-2. **Terraform** >= 1.0 (for infrastructure deployment)
+2. **Terraform** >= 1.15 (for infrastructure deployment)
    ```bash
    # macOS
    brew install terraform
@@ -190,7 +190,7 @@ This project has been tested with:
 - IBM COS version: 3.20.1.59
 - VMware vCenter: 7.0 U3
 - ESXi: 7.0 U3
-- Packer: 1.9.4
+- Packer: 1.15.4
 - Terraform: 1.6.6
 
 ## 📊 Deployment Workflow

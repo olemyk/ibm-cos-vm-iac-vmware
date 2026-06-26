@@ -37,8 +37,8 @@ Packer automates the complete installation and configuration process, creating r
    brew install packer
    
    # Linux
-   wget https://releases.hashicorp.com/packer/1.9.4/packer_1.9.4_linux_amd64.zip
-   unzip packer_1.9.4_linux_amd64.zip
+   wget https://releases.hashicorp.com/packer/1.15.4/packer_1.15.4_linux_amd64.zip
+   unzip packer_1.15.4_linux_amd64.zip
    sudo mv packer /usr/local/bin/
    ```
 
