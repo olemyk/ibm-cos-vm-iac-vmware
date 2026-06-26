@@ -14,6 +14,53 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Automated device approval via IBM COS API
 - Support for more than 3 Accesser nodes
 
+
+---
+
+## [1.3.0] – 2025-07-08
+
+### Fixed
+- **Terraform provider namespace** (`versions.tf`): migrated vSphere provider
+  source from deprecated `hashicorp/vsphere` to the canonical `vmware/vsphere`.
+  Eliminates the "provider has moved" warning on every `terraform init`.
+- **Child module provider inheritance** (`modules/cos-manager/main.tf`,
+  `modules/cos-accesser/main.tf`, `modules/cos-slicestor/main.tf`): added
+  `terraform { required_providers { vsphere = { source = "vmware/vsphere" } } }`
+  to each module. Without this, Terraform resolved child-module provider
+  references to the implicit `hashicorp/vsphere` address, installing both
+  providers and triggering the registry warning on every init.
+- **Perpetual disk diff on Manager and Accesser** (`modules/cos-manager/main.tf`,
+  `modules/cos-accesser/main.tf`): added `thin_provisioned = false` to the boot
+  disk block. VMs cloned from thick-provisioned Packer templates report
+  `thin_provisioned = false` in vSphere state; without the explicit attribute
+  the provider defaulted to `true`, generating a permanent plan diff on every run.
+- **Boot disk consistency on Slicestor** (`modules/cos-slicestor/main.tf`):
+  same `thin_provisioned = false` fix applied to the boot disk so it is
+  consistent with the 12 × thick-provisioned data disks.
+
+### Changed
+- **Packer SSH key now read from file** (`packer/cos-manager.pkr.hcl`,
+  `packer/cos-accesser.pkr.hcl`, `packer/cos-slicestor.pkr.hcl`): replaced
+  the hardcoded RSA public key in `boot_command` with a `locals` block that
+  reads `packer_rsa.pub` at build time via `trimspace(file(...))`. Running
+  `setup-ssh-key.sh` to generate a new key pair is now sufficient — no manual
+  copy-paste into HCL files required. An optional `packer_public_key` variable
+  allows CI overrides without touching the file.
+- **`packer/setup-ssh-key.sh`**: updated header and output messages to reflect
+  that the public key is injected automatically; improved next-steps guidance.
+- **`packer/variables.pkrvars.hcl.example`**: added commented-out
+  `packer_public_key` entry and a note to run `setup-ssh-key.sh` before building.
+
+### Security
+- **Removed `packer/packer_rsa.pub` from git tracking** (`git rm --cached`):
+  the file was previously committed despite being a machine-generated secret
+  tied to a specific key pair. `.gitignore` already listed it but had no effect
+  while the file remained tracked. The key is now untracked and git-ignored.
+- **Cleaned up `.gitignore`**: removed seven duplicate `packer/packer_rsa.pub`
+  entries and a contradictory "public keys are safe to commit" comment; replaced
+  with a single canonical block covering the full Packer key pair
+  (`packer_rsa`, `packer_rsa.pub`, `packer_rsa_bck`, `packer_rsa.pub_bck`).
+
 ---
 
 ## [1.2.0] – 2025-06-25
@@ -100,7 +147,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-[Unreleased]: https://github.com/olemyk/ibm-cos-vm-iac-vcenter/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/olemyk/ibm-cos-vm-iac-vcenter/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/olemyk/ibm-cos-vm-iac-vcenter/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/olemyk/ibm-cos-vm-iac-vcenter/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/olemyk/ibm-cos-vm-iac-vcenter/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/olemyk/ibm-cos-vm-iac-vcenter/releases/tag/v1.0.0

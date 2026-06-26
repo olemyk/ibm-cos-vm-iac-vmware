@@ -47,14 +47,19 @@ terraform.tfvars
 # Packer variable files with real credentials
 packer/variables.pkrvars.hcl
 !packer/variables.pkrvars.hcl.example
+packer/variables.pkrvars.hcl.test
 
 # SSH private keys
 *.pem
 *.key
 id_rsa
 id_rsa*
+
+# Packer SSH key pair — both private and public are machine-generated secrets
 packer/packer_rsa
-# Public keys are safe to commit — *.pub is NOT ignored
+packer/packer_rsa.pub
+packer/packer_rsa_bck
+packer/packer_rsa.pub_bck
 
 # =============================================================================
 # Large Binary Files — OVA / ISO Images

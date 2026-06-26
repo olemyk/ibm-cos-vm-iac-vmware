@@ -32,7 +32,13 @@ country      = "US"
 # The all-in-one ISO contains Manager, Accesser, and Slicestor installers
 iso_path = "[vmware_svc_cluster_fs900_3_1] iso/clevos-3.20.1.59-allinone-usbiso.iso"
 
+# SSH Key for Packer automation
+# Leave unset — Packer reads packer_rsa.pub automatically from this directory.
+# Only override if you want to supply a key from outside this directory:
+# packer_public_key = "ssh-rsa AAAA... user@host"
+
 # Notes:
+# - Run ./setup-ssh-key.sh once before building to generate packer_rsa / packer_rsa.pub
 # - Installation takes approximately 9 minutes
 # - Boot commands are based on real installation screenshots
 # - Template will be created in the specified folder

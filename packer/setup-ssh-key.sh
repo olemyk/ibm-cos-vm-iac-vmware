@@ -8,8 +8,10 @@
 # Run this once before building Packer templates:
 #   cd packer && ./setup-ssh-key.sh
 #
-# The private key (packer_rsa) is git-ignored.
-# The public key (packer_rsa.pub) is committed and embedded in Packer boot commands.
+# The private key (packer_rsa) is git-ignored — never commit it.
+# The public key (packer_rsa.pub) is read automatically by all Packer templates
+# at build time via the `locals { ssh_public_key = ... }` block in each .pkr.hcl.
+# No manual copy-paste of the key into HCL files is required.
 
 set -euo pipefail
 
@@ -37,9 +39,12 @@ else
     echo ""
 fi
 
-echo "Public key contents (embedded in Packer boot_command):"
-echo "--------------------------------------------------------"
+echo "Public key (will be injected automatically into boot_command at build time):"
+echo "------------------------------------------------------------------------------"
 cat "$KEY_FILE.pub"
 echo ""
-echo "Next step: copy variables.pkrvars.hcl.example → variables.pkrvars.hcl"
-echo "         then run: ./build-all-templates.sh"
+echo "Next steps:"
+echo "  1. copy variables.pkrvars.hcl.example → variables.pkrvars.hcl"
+echo "  2. Edit variables.pkrvars.hcl with your environment details"
+echo "  3. Run: packer build -var-file=variables.pkrvars.hcl cos-manager.pkr.hcl"
+echo "     (or use ./build-all-templates.sh to build all three templates)"

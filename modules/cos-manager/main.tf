@@ -3,6 +3,14 @@
 # SPDX-License-Identifier: Apache2.0
 #
 
+terraform {
+  required_providers {
+    vsphere = {
+      source = "vmware/vsphere"
+    }
+  }
+}
+
 # Deploy Manager VM by cloning from Packer template
 resource "vsphere_virtual_machine" "manager" {
   name             = var.vm_name
@@ -26,10 +34,11 @@ resource "vsphere_virtual_machine" "manager" {
     template_uuid = var.template_uuid
   }
   
-  # Boot disk (resize if needed)
+  # Boot disk - thick provisioned to match Packer template
   disk {
-    label = "disk0"
-    size  = var.disk_size
+    label            = "disk0"
+    size             = var.disk_size
+    thin_provisioned = false
   }
 }
 

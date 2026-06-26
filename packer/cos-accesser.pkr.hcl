@@ -115,6 +115,17 @@ variable "country" {
   description = "Country code"
 }
 
+variable "packer_public_key" {
+  type        = string
+  default     = ""
+  description = "SSH public key injected via boot_command. Defaults to packer_rsa.pub in this directory."
+}
+
+locals {
+  # Read from file when the variable is not explicitly supplied
+  ssh_public_key = var.packer_public_key != "" ? var.packer_public_key : trimspace(file("${path.root}/packer_rsa.pub"))
+}
+
 # Source configuration
 source "vsphere-iso" "cos-accesser" {
   # vCenter connection
@@ -215,7 +226,7 @@ source "vsphere-iso" "cos-accesser" {
     # ============================================================
     
     # Add SSH key (Packer-specific key) - must be quoted
-    "sshkeys set -- \"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDeAkZlikRo3eSFEUqZQP5yPjGLi1yOqAbiJGRLHwXHkCEidU+/RiDU5ByvIMnLkZG/K7DTSUJFNlp685WvbjBqz4cRCGERw7Qji0b5glObI+f9antsQLLCrcHQ5HHcAAzQ3U0ESlY1Z2uqgUizNIMptHBiWtygQOECdMhZprjLoKYoahlcZE8njV8BUQ0iFk4ij6H/u0YkKi5WiZSZmQe9w+SuOdx7VBk2q9w5MOLHqifHzsVlDwDdo+Vx++vuTWkGMS9lmYXlz+djMog0x5u2rLK/IJAipDsYcRd/fy+a8n1mEpzU322JFNLd5J03UvshVreOnfTX1pWfaeul8t2H/g9/Tu599oL7p163yegJ0ZYWGXZP4xbeDVmUbL73zzOL4VOaXeL8GlI47ckHQsyTiLaaXzCkCgOXCz8crU/GAcmWe9KA2TuIeUVQbUKNhZorLVANKiwIRh1mkzuPYV8j9hlqwnjVcz0LAo62ZECwagmtYa3PK3kiwOXSvF3HK3048FWlx2Ww9YADyd/QzuJvJdBlIH/z+QRelxMgbK2G78YPnoJ+DvO/NYNiK257UrfNMWfasFiwQu3jhW0WXSzcm1bWiOeKY717AYanoDtBR2I8fAy9J3LcblqA9BM+ZSPxSWdqhWG0qKvBUFlcHOvBNPGsM1Hvd/iIlnZI1TtbbQ== packer@ibm-cos-automation\"<enter><wait10>",
+    "sshkeys set -- \"${local.ssh_public_key}\"<enter><wait10>",
     
     # Activate SSH key configuration and exit edit mode
     "activate<enter><wait200>",     # Wait for activation to complete (exits edit mode)

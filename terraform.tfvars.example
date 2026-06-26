@@ -50,7 +50,7 @@ ssh_private_key_path = "./packer/packer_rsa"
 # =============================================================================
 cos_version    = "3.20.1.59"  # Must match Packer template version
 system_index   = 1
-num_slicestors = 3  # Must be 3 or 6
+num_slicestors = 3  # Must be 1, 3 or 6
 
 # =============================================================================
 # Network Configuration
@@ -80,7 +80,7 @@ accesser_disk_size = 128    # GB boot disk
 slicestor_cpu              = 2      # vCPUs
 slicestor_memory           = 8192   # 8 GB RAM
 slicestor_disk_size        = 128    # GB boot disk
-slicestor_data_disk_size   = 128    # GB per data disk (12 disks = 1.5 TB per Slicestor)
+slicestor_data_disk_size   = 16    # GB per data disk (12 disks per Slicestor)
 slicestor_data_disk_count  = 12     # Number of data disks per Slicestor
 
 # =============================================================================
