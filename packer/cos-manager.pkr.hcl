@@ -10,11 +10,11 @@
 #   packer build -var-file=variables.pkrvars.hcl cos-manager.pkr.hcl
 
 packer {
-  required_version = ">= 1.8.0"
-  
+  required_version = ">= 1.15.0"
+
   required_plugins {
     vsphere = {
-      version = ">= 1.2.0"
+      version = ">= 2.2.0"
       source  = "github.com/hashicorp/vsphere"
     }
   }

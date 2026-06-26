@@ -4,16 +4,16 @@
 #
 
 terraform {
-  required_version = ">= 1.0"
+  required_version = ">= 1.15"
 
   required_providers {
     vsphere = {
       source  = "hashicorp/vsphere"
-      version = "~> 2.6"
+      version = "~> 2.12"
     }
     null = {
       source  = "hashicorp/null"
-      version = "~> 3.2"
+      version = "~> 3.3"
     }
   }
 }
